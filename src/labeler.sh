@@ -3,7 +3,7 @@ set -euo pipefail
 
 # --- Existing Functions ---
 
-# --- Existing Functions ---
+local language_labels
 
 labeler::label() {
   local -r xs_label="${1}"
@@ -44,6 +44,8 @@ labeler::label() {
   # ---- Add Language Labeling ----
   log::message "Detecting languages in changed files..."
   labeler::add_language_labels "$pr_number"
+  local all_new_labels=("${language_labels[@]}" "$label_to_add")
+  github::add_labels_to_pr "$pr_number" "${all_new_labels[@]}"
 }
 
 labeler::label_for() {
@@ -145,7 +147,6 @@ labeler::add_language_labels() {
   for lang_label in "${!languages[@]}"; do
     new_lang_labels+=("$lang_label")
     log::message "Adding language label: ${lang_label}"
-    github::add_label "$pr_number" "$lang_label"
   done
-  github::add_language_labels_to_pr "$pr_number" "${new_lang_labels[@]}"
+  
 }

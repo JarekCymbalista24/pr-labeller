@@ -90,7 +90,7 @@ github::add_label_to_pr() {
     "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$pr_number" >/dev/null
 }
 
-github::add_language_labels_to_pr() {
+github::add_labels_to_pr() {
   local -r pr_number="${1}"
   shift
   # All new labels (size and language) are passed as additional arguments.
