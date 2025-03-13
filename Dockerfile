@@ -1,7 +1,6 @@
 FROM ruby:3.1.3-alpine
 
-RUN apk add --no-cache bash curl jq wget
-RUN apk update && apk add --no-cache build-base libffi-dev libxml2-dev libxslt-dev
+RUN apk update && apk add --no-cache bash curl jq wget cmake build-base libffi-dev libxml2-dev libxslt-dev
 RUN gem install github-linguist
 RUN mkdir -p "$HOME/bin" && \
     cd "$HOME/bin" && \
