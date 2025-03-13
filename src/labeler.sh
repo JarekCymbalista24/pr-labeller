@@ -16,9 +16,9 @@ labeler::label() {
   
   # Process language labels input (if provided).
   local lang_labels=""
-  if [ -n "${LANGUAGE_LABELS:-}" ]; then
+  if [ -n "$language_labels" ]; then
     # Convert comma-separated list to newline-separated list.
-    lang_labels=$(echo "$LANGUAGE_LABELS" | tr ',' '\n' | xargs -I {} echo "{}")
+    lang_labels=$(echo "$language_labels" | tr ',' '\n' | xargs -I {} echo "{}")
     echo "Language labels: $lang_labels"
   fi
   
