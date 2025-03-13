@@ -61,4 +61,6 @@ labeler::label_for() {
   else
     echo "$xl_label"
   fi
+  
+  echo "$label"
 }

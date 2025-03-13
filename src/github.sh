@@ -107,8 +107,7 @@ github::add_label_to_pr() {
   all_labels=$(printf "%s\n%s" "$filtered_current_labels" "$new_labels")
   all_labels=$(echo "$all_labels" | sed '/^\s*$/d' | sort -u)
   
-  local comma_separated_labels
-  comma_separated_labels=$(github::format_labels "$all_labels")
+  local -r comma_separated_labels=$(github::format_labels "$all_labels")
   
   echo "Final labels to add: $comma_separated_labels"
   
