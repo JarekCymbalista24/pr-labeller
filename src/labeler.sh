@@ -3,7 +3,7 @@ set -euo pipefail
 
 # --- Existing Functions ---
 
-local language_labels
+language_labels=()
 
 labeler::label() {
   local -r xs_label="${1}"
