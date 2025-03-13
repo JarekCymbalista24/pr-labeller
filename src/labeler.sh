@@ -3,6 +3,8 @@ set -euo pipefail
 
 # --- Existing Functions ---
 
+# --- Existing Functions ---
+
 labeler::label() {
   local -r xs_label="${1}"
   local -r s_label="${3}"
