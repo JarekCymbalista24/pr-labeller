@@ -143,9 +143,8 @@ labeler::add_language_labels() {
   done
 
   # Add each detected language label to the PR.
-  local -a new_lang_labels=()
   for lang_label in "${!languages[@]}"; do
-    new_lang_labels+=("$lang_label")
+    language_labels+=("$lang_label")
     log::message "Adding language label: ${lang_label}"
   done
   
