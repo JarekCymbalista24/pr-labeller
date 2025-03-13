@@ -5,6 +5,9 @@ inputs:
     description: 'GitHub token needed to interact with the repository'
     required: false
     default: ${{ github.token }}
+  LANGUAGE_LABELS:
+    description: 'Labels of detected languages'
+    required: true
   xs_label:
     description: 'Label for xs PR'
     required: false
