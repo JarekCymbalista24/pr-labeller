@@ -88,6 +88,8 @@ github::add_label_to_pr() {
   local -r m_label="${5}"
   local -r l_label="${6}"
   local -r xl_label="${7}"
+
+  echo "Adding labels to PR #$pr_number: $new_labels"
   
   # Fetch current labels on the PR (using the pulls API)
   local current_labels
