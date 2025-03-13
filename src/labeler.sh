@@ -93,55 +93,51 @@ github::add_label() {
 # and adds corresponding language labels (prefixed with "pr: lang/").
 labeler::add_language_labels() {
   local pr_number="$1"
-
-  # Fetch changed files for the PR.
-  local files_json
-  files_json=$(curl -s -H "Authorization: token ${GITHUB_TOKEN}" \
-    "https://api.github.com/repos/${GITHUB_REPOSITORY}/pulls/${pr_number}/files")
-
-  # Declare an associative array to avoid duplicate labels.
-  declare -A languages=()
-
-  # Loop over each file and determine language based on file extension.
-  for file in $(echo "$files_json" | jq -r '.[].filename'); do
-    ext="${file##*.}"
-    case "$ext" in
-      js|jsx)
-        languages["pr: lang/javascript"]=1
-        ;;
-      ts|tsx)
-        languages["pr: lang/typescript"]=1
-        ;;
-      py)
-        languages["pr: lang/python"]=1
-        ;;
-      rb)
-        languages["pr: lang/ruby"]=1
-        ;;
-      java)
-        languages["pr: lang/java"]=1
-        ;;
-      go)
-        languages["pr: lang/go"]=1
-        ;;
-      cs)
-        languages["pr: lang/csharp"]=1
-        ;;
-      cpp)
-        languages["pr: lang/cpp"]=1
-        ;;
-      c)
-        languages["pr: lang/c"]=1
-        ;;
-      php)
-        languages["pr: lang/php"]=1
-        ;;
-      *)
-        # Optionally add a default label for unknown extensions.
-        ;;
-    esac
+  
+  # Create a temporary directory for the changed files.
+  local tmp_dir
+  tmp_dir=$(mktemp -d)
+  
+  # Determine changed files. You may adjust this diff range as needed.
+  # This example uses 'origin/main' as the base.
+  local changed_files
+  changed_files=$(git diff --name-only origin/main...HEAD)
+  
+  # Copy each changed file into the temporary directory preserving structure.
+  for file in $changed_files; do
+    if [ -f "$file" ]; then
+      mkdir -p "$tmp_dir/$(dirname "$file")"
+      cp "$file" "$tmp_dir/$file"
+    fi
   done
 
+  # Run Linguist on the temporary directory. Ensure that Ruby and the github-linguist gem are installed.
+  local linguist_output
+  linguist_output=$(linguist --breakdown "$tmp_dir")
+  
+  # Debug: Output the linguist breakdown.
+  log::message "Linguist output:"
+  log::message "$linguist_output"
+  
+  # Parse Linguist output to get language names.
+  # Expected output lines: "LanguageName  xx.xx%"
+  local -a languages=()
+  while IFS= read -r line; do
+    # Skip empty lines.
+    [ -z "$line" ] && continue
+    # Extract the language name (first column)
+    local lang
+    lang=$(echo "$line" | awk '{print $1}')
+    # Optionally, skip a generic "Other" language.
+    if [ "$lang" = "Other" ]; then
+      continue
+    fi
+    # Build a label and convert to lowercase.
+    languages+=("pr: lang/$(echo "$lang" | tr '[:upper:]' '[:lower:]')")
+  done <<< "$linguist_output"
+  
+  # Clean up temporary directory.
+  rm -rf "$tmp_dir"
   # Add each detected language label to the PR.
   for lang_label in "${!languages[@]}"; do
     language_labels+=("$lang_label")
