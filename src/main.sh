@@ -21,6 +21,7 @@ main() {
 
   : "${language_labels:=}"
   export LANGUAGE_LABELS="$language_labels"
+  log::message "Language labels: $language_labels"
 
   labeler::label \
     "$xs_label" \
