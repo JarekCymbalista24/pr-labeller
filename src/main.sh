@@ -18,6 +18,8 @@ main() {
 
   export GITHUB_TOKEN="$github_token"
   export GITHUB_API_URL="$github_api_url"
+
+  : "${language_labels:=}"
   export LANGUAGE_LABELS="$language_labels"
 
   labeler::label \
