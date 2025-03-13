@@ -65,22 +65,51 @@ github::has_label() {
   return 1
 }
 
+# Formats an array of labels into a comma-separated JSON array of quoted strings.
+github::format_labels() {
+  SAVEIFS=$IFS
+  IFS=$'\n'
+  local -r labels=("$@")
+  IFS=$SAVEIFS
+  local quoted_labels=()
+  for label in "${labels[@]}"; do
+    quoted_labels+=("\"$label\"")
+  done
+  IFS=,; echo "${quoted_labels[*]}"
+}
+
+# This function fetches the current labels on the PR, filters out any existing size labels,
+# combines them with new labels (provided as a newline‐separated string), and patches the PR.
 github::add_label_to_pr() {
   local -r pr_number="${1}"
-  local -r label_to_add="${2}"
+  local -r new_labels="${2}"  # new labels as a newline-separated string
   local -r xs_label="${3}"
   local -r s_label="${4}"
   local -r m_label="${5}"
   local -r l_label="${6}"
   local -r xl_label="${7}"
-
-  local -r body=$(curl -sSL -H "Authorization: token $GITHUB_TOKEN" -H "$GITHUB_API_HEADER" "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/pulls/$pr_number")
-  local labels=$(echo "$body" | jq .labels | jq -r ".[] | .name" | grep -w -e "$xs_label" -e "$s_label" -e "$m_label" -e "$l_label" -e "$xl_label" -v)
-  labels=$(printf "%s\n%s" "$labels" "$label_to_add")
-  local -r comma_separated_labels=$(github::format_labels "$labels")
-
-  log::message "Final labels: $comma_separated_labels"
-
+  
+  # Fetch current labels on the PR (using the pulls API)
+  local current_labels
+  current_labels=$(curl -sSL \
+    -H "Authorization: token $GITHUB_TOKEN" \
+    -H "$GITHUB_API_HEADER" \
+    "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/pulls/$pr_number" | jq -r '.labels[].name')
+  
+  # Filter out any existing size labels.
+  local filtered_current_labels
+  filtered_current_labels=$(echo "$current_labels" | grep -vwE "^(size/xs|size/s|size/m|size/l|size/xl)$" || true)
+  
+  # Combine the filtered current labels with the new labels.
+  local all_labels
+  all_labels=$(printf "%s\n%s" "$filtered_current_labels" "$new_labels")
+  all_labels=$(echo "$all_labels" | sed '/^\s*$/d' | sort -u)
+  
+  local comma_separated_labels
+  comma_separated_labels=$(github::format_labels "$all_labels")
+  
+  echo "Final labels to add: $comma_separated_labels"
+  
   curl -sSL \
     -H "Authorization: token $GITHUB_TOKEN" \
     -H "$GITHUB_API_HEADER" \
@@ -88,22 +117,6 @@ github::add_label_to_pr() {
     -H "Content-Type: application/json" \
     -d "{\"labels\":[$comma_separated_labels]}" \
     "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$pr_number" >/dev/null
-}
-
-github::format_labels() {
-  SAVEIFS=$IFS
-  IFS=$'\n'
-  local -r labels=($@)
-  IFS=$SAVEIFS
-  quoted_labels=()
-
-  for ((i = 0; i < ${#labels[@]}; i++)); do
-    #    echo "Label $i: ${labels[$i]}"
-    label="${labels[$i]}"
-    quoted_labels+=("$(str::quote "$label")")
-  done
-
-  coll::join_by "," "${quoted_labels[@]/#/}"
 }
 
 github::comment() {
