@@ -18,6 +18,7 @@ main() {
 
   export GITHUB_TOKEN="$github_token"
   export GITHUB_API_URL="$github_api_url"
+  export LANGUAGE_LABELS="$language_labels"
 
   labeler::label \
     "$xs_label" \
@@ -34,7 +35,7 @@ main() {
     "$files_to_ignore" \
     "$ignore_line_deletions" \
     "$ignore_file_deletions" \
-    "$LANGUAGE_LABELS"
+    "$language_labels"
 
   exit $?
 }
