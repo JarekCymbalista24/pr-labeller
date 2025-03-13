@@ -23,10 +23,11 @@ labeler::label() {
 
   local -r label_to_add=$(labeler::label_for "$total_modifications" "$@")
 
-  log::message "Labeling pull request with $label_to_add"
+  log::message "Labeling pull request with size label: $label_to_add"
 
   github::add_label_to_pr "$pr_number" "$label_to_add" "$xs_label" "$s_label" "$m_label" "$l_label" "$xl_label"
 
+  # If the PR size label is "xl", handle the extra messages or failure as before.
   if [ "$label_to_add" == "$xl_label" ]; then
     if [ -n "$message_if_xl" ] && ! github::has_label "$pr_number" "$label_to_add"; then
       github::comment "$message_if_xl"
@@ -37,6 +38,10 @@ labeler::label() {
       exit 1
     fi
   fi
+
+  # ---- Add Language Labeling ----
+  log::message "Detecting languages in changed files..."
+  labeler::add_language_labels "$pr_number"
 }
 
 labeler::label_for() {
