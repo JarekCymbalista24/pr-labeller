@@ -21,7 +21,6 @@ main() {
 
   log::message "Language labels: $language_labels"
   log::message "GitHub API URL: $GITHUB_API_URL"
-  log::message "GitHub T
 
   labeler::label \
     "$xs_label" \
