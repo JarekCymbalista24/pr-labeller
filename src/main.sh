@@ -18,9 +18,8 @@ main() {
 
   export GITHUB_TOKEN="$github_token"
   export GITHUB_API_URL="$github_api_url"
-  export language_labels="$language_labels"
 
-  log::message "Language labels: $language_labels"
+  log::message "Language labels: ${language_labels}"
   log::message "GitHub API URL: $GITHUB_API_URL"
 
   labeler::label \
