@@ -90,6 +90,49 @@ github::add_label_to_pr() {
     "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$pr_number" >/dev/null
 }
 
+github::add_language_labels_to_pr() {
+  local -r pr_number="${1}"
+  shift
+  # All new labels (size and language) are passed as additional arguments.
+  local -a new_labels=("$@")
+
+  # Fetch current labels from the issue (pull request).
+  local current_labels
+  current_labels=$(curl -sSL \
+    -H "Authorization: token $GITHUB_TOKEN" \
+    -H "$GITHUB_API_HEADER" \
+    "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$pr_number" | jq -r '.labels[].name')
+
+  # Remove any existing size labels from current labels to avoid duplicates.
+  # (Assumes size labels follow a pattern like "size/xs", "size/s", etc.)
+  local filtered_current_labels
+  filtered_current_labels=$(echo "$current_labels" | grep -vwE "^(size/xs|size/s|size/m|size/l|size/xl)$" || true)
+
+  # Combine filtered current labels with the new labels.
+  local all_labels
+  all_labels=$(printf "%s\n%s" "$filtered_current_labels" "$(printf "%s\n" "${new_labels[@]}")")
+  # Remove empty lines.
+  all_labels=$(echo "$all_labels" | sed '/^\s*$/d')
+  # Remove duplicates by sorting uniquely.
+  local unique_labels
+  unique_labels=$(echo "$all_labels" | sort -u)
+
+  # Format the labels as a comma-separated JSON array.
+  local -r comma_separated_labels
+  comma_separated_labels=$(github::format_labels "$unique_labels")
+
+  log::message "Final labels: $comma_separated_labels"
+
+  # Update the PR (issue) with the combined labels.
+  curl -sSL \
+    -H "Authorization: token $GITHUB_TOKEN" \
+    -H "$GITHUB_API_HEADER" \
+    -X PATCH \
+    -H "Content-Type: application/json" \
+    -d "{\"labels\":[$comma_separated_labels]}" \
+    "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$pr_number" >/dev/null
+}
+
 github::format_labels() {
   SAVEIFS=$IFS
   IFS=$'\n'
