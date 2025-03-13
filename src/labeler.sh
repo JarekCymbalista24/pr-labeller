@@ -25,7 +25,7 @@ labeler::label() {
   # Combine the size label with the language labels.
   local combined_labels
   if [ -n "$lang_labels" ]; then
-    combined_labels=$(printf "%s\n%s" "$size_label" "$lang_labels")
+    combined_labels=$(printf "%s,%s" "$size_label" "$lang_labels")
   else
     combined_labels="$size_label"
   fi
