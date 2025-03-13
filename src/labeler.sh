@@ -43,7 +43,7 @@ labeler::label() {
 
   # ---- Add Language Labeling ----
   log::message "Detecting languages in changed files..."
-  labeler::add_language_labels "$pr_number"
+  labeler::add_labels_to_pr "$pr_number"
   local all_new_labels=("${language_labels[@]}" "$label_to_add")
   github::add_labels_to_pr "$pr_number" "${all_new_labels[@]}"
 }
@@ -91,57 +91,46 @@ github::add_label() {
 
 # This function fetches changed files, determines languages from file extensions,
 # and adds corresponding language labels (prefixed with "pr: lang/").
-labeler::add_language_labels() {
-  local pr_number="$1"
-  
-  # Create a temporary directory for the changed files.
+labeler::add_labels_to_pr() {
+local pr_number="$1"
   local tmp_dir
   tmp_dir=$(mktemp -d)
-  
-  # Determine changed files. You may adjust this diff range as needed.
-  # This example uses 'origin/main' as the base.
-  local changed_files
-  changed_files=$(git diff --name-only origin/main...HEAD)
-  
-  # Copy each changed file into the temporary directory preserving structure.
-  for file in $changed_files; do
-    if [ -f "$file" ]; then
-      mkdir -p "$tmp_dir/$(dirname "$file")"
-      cp "$file" "$tmp_dir/$file"
-    fi
-  done
 
-  # Run Linguist on the temporary directory. Ensure that Ruby and the github-linguist gem are installed.
+  # Fetch the repository tarball.
+  # GITHUB_REPOSITORY is in the format "owner/repo" and GITHUB_REF_NAME contains the branch or ref.
+  # You might need to adjust this if you're working with PR-specific refs.
+  local repo_tarball_url="https://api.github.com/repos/${GITHUB_REPOSITORY}/tarball/${GITHUB_REF_NAME}"
+  
+  log::message "Fetching repository tarball from: ${repo_tarball_url}"
+  # Use curl with a GitHub token if needed:
+  curl -L -H "Authorization: token ${GITHUB_TOKEN}" "${repo_tarball_url}" | tar -xz -C "$tmp_dir" --strip-components=1
+
+  # Run Linguist on the downloaded repository code.
   local linguist_output
   linguist_output=$(linguist --breakdown "$tmp_dir")
   
-  # Debug: Output the linguist breakdown.
   log::message "Linguist output:"
   log::message "$linguist_output"
   
-  # Parse Linguist output to get language names.
-  # Expected output lines: "LanguageName  xx.xx%"
+  # Parse Linguist output to extract language names.
   local -a languages=()
   while IFS= read -r line; do
-    # Skip empty lines.
     [ -z "$line" ] && continue
-    # Extract the language name (first column)
+    # Assume the language is the first word on the line.
     local lang
     lang=$(echo "$line" | awk '{print $1}')
-    # Optionally, skip a generic "Other" language.
     if [ "$lang" = "Other" ]; then
       continue
     fi
-    # Build a label and convert to lowercase.
     languages+=("pr: lang/$(echo "$lang" | tr '[:upper:]' '[:lower:]')")
   done <<< "$linguist_output"
   
-  # Clean up temporary directory.
+  # Clean up the temporary directory.
   rm -rf "$tmp_dir"
-  # Add each detected language label to the PR.
-  for lang_label in "${!languages[@]}"; do
-    language_labels+=("$lang_label")
-    log::message "Adding language label: ${lang_label}"
-  done
   
+  # Add each detected language label to the PR.
+  for lang_label in "${languages[@]}"; do
+    log::message "Adding language label: ${lang_label}"
+    github::add_label "$pr_number" "$lang_label"
+  done
 }
