@@ -15,17 +15,17 @@ labeler::label() {
   echo "Size label: $size_label"
   
   # Process language labels input (if provided).
-  local language_labels=""
+  local lang_labels=""
   if [ -n "${LANGUAGE_LABELS:-}" ]; then
     # Convert comma-separated list to newline-separated list.
-    language_labels=$(echo "$LANGUAGE_LABELS" | tr ',' '\n' | xargs -I {} echo "{}")
-    echo "Language labels: $language_labels"
+    lang_labels=$(echo "$LANGUAGE_LABELS" | tr ',' '\n' | xargs -I {} echo "{}")
+    echo "Language labels: $lang_labels"
   fi
   
   # Combine the size label with the language labels.
   local combined_labels
-  if [ -n "$language_labels" ]; then
-    combined_labels=$(printf "%s\n%s" "$size_label" "$language_labels")
+  if [ -n "$lang_labels" ]; then
+    combined_labels=$(printf "%s\n%s" "$size_label" "$lang_labels")
   else
     combined_labels="$size_label"
   fi
