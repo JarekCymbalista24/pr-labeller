@@ -34,8 +34,6 @@ main() {
     "$message_if_xl" \
     "$files_to_ignore" \
     "$ignore_line_deletions" \
-    "$ignore_file_deletions" \
-    "$language_labels"
-
+    "$ignore_file_deletions"
   exit $?
 }
