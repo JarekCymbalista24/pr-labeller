@@ -96,13 +96,14 @@ github::add_labels_to_pr() {
   # All new labels (size and language) are passed as additional arguments.
   local -a new_labels=("$@")
 
+  log::message "before fetch"
   # Fetch current labels from the issue (pull request).
   local current_labels
   current_labels=$(curl -sSL \
     -H "Authorization: token $GITHUB_TOKEN" \
     -H "$GITHUB_API_HEADER" \
     "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/issues/$pr_number" | jq -r '.labels[].name')
-
+  log::message "after fetch"
   # Remove any existing size labels from current labels to avoid duplicates.
   # (Assumes size labels follow a pattern like "size/xs", "size/s", etc.)
   local filtered_current_labels

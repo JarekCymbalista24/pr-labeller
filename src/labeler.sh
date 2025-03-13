@@ -25,9 +25,9 @@ labeler::label() {
 
   local -r label_to_add=$(labeler::label_for "$total_modifications" "$@")
 
-  log::message "Labeling pull request with size label: $label_to_add"
+  # log::message "Labeling pull request with size label: $label_to_add"
 
-  github::add_label_to_pr "$pr_number" "$label_to_add" "$xs_label" "$s_label" "$m_label" "$l_label" "$xl_label"
+  # github::add_label_to_pr "$pr_number" "$label_to_add" "$xs_label" "$s_label" "$m_label" "$l_label" "$xl_label"
 
   # If the PR size label is "xl", handle the extra messages or failure as before.
   if [ "$label_to_add" == "$xl_label" ]; then
