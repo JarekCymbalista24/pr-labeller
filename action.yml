@@ -8,6 +8,7 @@ inputs:
   language_labels:
     description: 'Labels of detected languages'
     required: true
+    default: '[]'
   xs_label:
     description: 'Label for xs PR'
     required: false
