@@ -76,6 +76,7 @@ runs:
   using: 'docker'
   image: 'Dockerfile'
   args:
+    - --language_labels=${{ inputs.language_labels }}
     - --github_token=${{ inputs.GITHUB_TOKEN }}
     - --github_api_url=${{ inputs.github_api_url }}
     - --xs_label=${{ inputs.xs_label }}
