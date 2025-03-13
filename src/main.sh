@@ -19,9 +19,7 @@ main() {
   export GITHUB_TOKEN="$github_token"
   export GITHUB_API_URL="$github_api_url"
 
-  : "${language_labels:=}"
-  export LANGUAGE_LABELS="$language_labels"
-  log::message "Language labels: $LANGUAGE_LABELS"
+  log::message "Language labels: $language_labels"
   log::message "GitHub API URL: $GITHUB_API_URL"
   log::message "GitHub T
 
@@ -39,6 +37,7 @@ main() {
     "$message_if_xl" \
     "$files_to_ignore" \
     "$ignore_line_deletions" \
-    "$ignore_file_deletions"
+    "$ignore_file_deletions" \
+    "$language_labels"
   exit $?
 }
