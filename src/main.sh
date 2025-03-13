@@ -20,8 +20,9 @@ main() {
   export GITHUB_API_URL="$github_api_url"
 
   : "${language_labels:=}"
-  export LANGUAGE_LABELS="$language_labels"
-  log::message "Language labels: $language_labels"
+  export LANGUAGE_LABELS="$LANGUAGE_LABELS"
+  log::message "Language labels: $LANGUAGE_LABELS"
+  log::message "GitHub API URL: $GITHUB_API_URL"
 
   labeler::label \
     "$xs_label" \
