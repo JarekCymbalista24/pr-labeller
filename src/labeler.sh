@@ -103,7 +103,7 @@ local pr_number="$1"
   
   log::message "Fetching repository tarball from: ${repo_tarball_url}"
   # Use curl with a GitHub token if needed:
-  curl -L -H "Authorization: token ${GITHUB_TOKEN}" "${repo_tarball_url}" | tar -xz -C "$tmp_dir" --strip-components=1
+  curl -L -H "Authorization: token ${GITHUB_TOKEN}" "${repo_tarball_url}" | tar -xf -C "$tmp_dir" --strip-components=1
 
   # Run Linguist on the downloaded repository code.
   local linguist_output
