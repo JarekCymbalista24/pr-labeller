@@ -12,8 +12,11 @@ RUN apt-get update && apt-get install -y \
     libffi-dev \
     libxml2-dev \
     libxslt-dev \
+    libssl-dev \
     git \
     && rm -rf /var/lib/apt/lists/*
+
+ENV OPENSSL_ROOT_DIR=/usr
 
 RUN gem install github-linguist
 
