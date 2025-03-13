@@ -118,7 +118,7 @@ github::add_language_labels_to_pr() {
   unique_labels=$(echo "$all_labels" | sort -u)
 
   # Format the labels as a comma-separated JSON array.
-  local -r comma_separated_labels
+  local comma_separated_labels
   comma_separated_labels=$(github::format_labels "$unique_labels")
 
   log::message "Final labels: $comma_separated_labels"
