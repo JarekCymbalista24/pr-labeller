@@ -34,7 +34,7 @@ main() {
     "$files_to_ignore" \
     "$ignore_line_deletions" \
     "$ignore_file_deletions" \
-    "$language_labels"
+    "$LANGUAGE_LABELS"
 
   exit $?
 }
