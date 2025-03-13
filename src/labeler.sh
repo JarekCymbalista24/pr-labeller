@@ -25,10 +25,12 @@ labeler::label() {
   # Combine the size label with the language labels.
   local combined_labels
   if [ -n "$lang_labels" ]; then
-    combined_labels=$(printf "%s,%s" "$size_label" "$lang_labels")
+    combined_labels=$(printf "%s\n%s" "$size_label" "$lang_labels")
   else
     combined_labels="$size_label"
   fi
+
+  echo "Combined labels: $combined_labels"
   
   # Use github::add_label_to_pr to update the PR with all labels.
   github::add_label_to_pr "$pr_number" "$combined_labels" "size/xs" "size/s" "size/m" "size/l" "size/xl"
