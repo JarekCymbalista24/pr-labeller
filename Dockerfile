@@ -1,7 +1,6 @@
-FROM ruby:3.1.3-alpine
+FROM alpine:3.15
 
-RUN apk update && apk add --no-cache bash curl jq wget cmake build-base libffi-dev libxml2-dev libxslt-dev
-RUN gem install github-linguist
+RUN apk add --no-cache bash curl jq wget
 RUN mkdir -p "$HOME/bin" && \
     cd "$HOME/bin" && \
     wget https://github.com/denisidoro/docpars/releases/download/v0.2.0/docpars-v0.2.0-x86_64-unknown-linux-musl.tar.gz && tar xvfz docpars-v0.2.0-x86_64-unknown-linux-musl.tar.gz -C ./ && \
