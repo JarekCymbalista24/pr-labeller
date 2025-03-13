@@ -1,6 +1,18 @@
-FROM alpine:3.15
+FROM ubuntu:22.04
 
-RUN apk add --no-cache bash curl jq wget
+RUN apt-get update && apt-get install -y \
+    bash \
+    curl \
+    jq \
+    wget \
+    ruby-full \
+    build-essential \
+    cmake \
+    libffi-dev \
+    libxml2-dev \
+    libxslt-dev \
+    git
+
 RUN mkdir -p "$HOME/bin" && \
     cd "$HOME/bin" && \
     wget https://github.com/denisidoro/docpars/releases/download/v0.2.0/docpars-v0.2.0-x86_64-unknown-linux-musl.tar.gz && tar xvfz docpars-v0.2.0-x86_64-unknown-linux-musl.tar.gz -C ./ && \
