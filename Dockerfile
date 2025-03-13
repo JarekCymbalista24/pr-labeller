@@ -8,10 +8,12 @@ RUN apt-get update && apt-get install -y \
     ruby-full \
     build-essential \
     cmake \
+    pkg-config \
     libffi-dev \
     libxml2-dev \
     libxslt-dev \
-    git
+    git \
+    && rm -rf /var/lib/apt/lists/*
 
 RUN gem install github-linguist
 
